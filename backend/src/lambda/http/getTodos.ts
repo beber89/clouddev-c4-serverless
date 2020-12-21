@@ -1,30 +1,17 @@
 import 'source-map-support/register'
-import * as AWS from 'aws-sdk'
 import {getUserId} from '../utils'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
+import { TodosRepository } from '../awsRepository/todosRepository';
 
-const docClient = new AWS.DynamoDB.DocumentClient();
-const todosTable = process.env.TODOS_TABLE;
-
+const repo = new TodosRepository();
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   console.log('Processing event: ', event)
   // DONE: Get all TODO items for a current user
-  const queryParams = {
-    TableName: todosTable,
-    KeyConditionExpression: "#a = :a",
-    ExpressionAttributeNames: {
-        "#a": "userId"
-    },
-    ExpressionAttributeValues: {
-        ":a": getUserId(event)
-    }
-  };
 
-  const result = await docClient.query(queryParams).promise();
+  const items = await repo.getAllTodosPerUser(getUserId(event));
 
-  const items = result.Items
   return {
     statusCode: 200,
     headers: {
