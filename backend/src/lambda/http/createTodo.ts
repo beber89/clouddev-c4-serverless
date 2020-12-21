@@ -4,9 +4,8 @@ import {getUserId} from '../utils'
 
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
 import { TodoItem } from '../../models/TodoItem'
-import { TodosRepository } from '../awsRepository/todosRepository'
+import { createTodoItem } from '../businessLogic/todos'
 
-const repo = new TodosRepository();
 
 
 
@@ -17,7 +16,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
   // DONE: Implement creating a new TODO item
 
-  const newItem: TodoItem = await repo.createTodoItem(getUserId(event), parsedBody);
+  const newItem: TodoItem = await createTodoItem(getUserId(event), parsedBody);
 
   console.log("created new todo item: " + newItem);
 

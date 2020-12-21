@@ -1,13 +1,10 @@
 import 'source-map-support/register'
-import * as AWS from 'aws-sdk'
 
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
 
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
 import { getUserId } from '../utils';
-import { TodosRepository } from '../awsRepository/todosRepository';
-
-const repo = new TodosRepository();
+import { updateTodoItem } from '../businessLogic/todos';
 
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -16,7 +13,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
   // DONE: Update a TODO item with the provided id using values in the "updatedTodo" object
 
-  const updatedItem = await repo.updateTodoItem(getUserId(event), todoDto, itemId);
+  const updatedItem = await updateTodoItem(getUserId(event), todoDto, itemId);
 
 
   console.log("Updated Item " + itemId + " with " + updatedItem);
