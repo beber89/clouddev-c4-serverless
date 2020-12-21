@@ -4,6 +4,7 @@ import * as uuid from 'uuid'
 import * as AWSXRay from 'aws-xray-sdk'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
+import { getUserId } from '../utils'
 
 const bucketName = process.env.IMAGES_S3_BUCKET
 const urlExpiration = process.env.SIGNED_URL_EXPIRATION
@@ -18,6 +19,7 @@ const s3 = new XAWS.S3({
 })
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  console.log('Processing event: ', event)
   const todoId = event.pathParameters.todoId
 
   // DONE: Return a presigned URL to upload a file for a TODO item with the provided id
@@ -33,7 +35,8 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const dbUpdateRequestBody = {
         TableName: todosTable,
         Key: { 
-            "todoId": todoId 
+            userId: getUserId(event),
+            todoId: todoId 
         },
         UpdateExpression: "set #a = :a",
         ExpressionAttributeNames: {
@@ -46,6 +49,8 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     }
 
 await docClient.update(dbUpdateRequestBody).promise()
+
+console.log("Updated OK ... ");
 
   return {
       statusCode: 200,

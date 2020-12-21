@@ -3,6 +3,7 @@ import * as AWS from 'aws-sdk'
 
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
+import { getUserId } from '../utils';
 
 
 const docClient = new AWS.DynamoDB.DocumentClient();
@@ -12,9 +13,10 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   console.log('Processing event: ', event)
   const itemId = event.pathParameters.todoId
 
-  // TODO: Remove a TODO item by id
+  // DONE: Remove a TODO item by id
   const itemKeyToBeDeleted = {
-    "todoId": itemId
+    userId: getUserId(event),
+    todoId: itemId
   }
 
   const result = await docClient.delete({
@@ -24,7 +26,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   console.log("Result of deletion ... ", result);
 
   return {
-    statusCode: 201,
+    statusCode: 200,
     headers: {
         "Access-Control-Allow-Origin": "*",
     },
